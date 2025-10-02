@@ -220,4 +220,6 @@ def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_desc
 
 conn = connect_db("testprojet")
 
-""""""  
+"""def add_record(conn, table_name, entetes, [entetes][valeurs]
+
+"""  
