@@ -1,5 +1,34 @@
 import sqlite3
 
+
+
+'''
+
+faudrait faire 2 fonctions add delete + 3 fonctions modifier
+
+au lieu de 3*3 fonctions 
+
+on passe de 9 fonctions à 5 fonctions
+
+
+
+
+pour les 3 tables faut pouvoir ajouter supprimer et modifier
+
+soit on fait 3 fonctions add delete modify avec pour chaque tables
+
+soit on fait 2 fonctions add delete ou on modifie juste la table, on la met en variable
+et 3 fonctions modify pour chaque table
+
+
+'''
+
+
+
+
+
+
+
 def connect_db(db_name):
     """bah ca se connecte quoi."""
     conn = sqlite3.connect(db_name)
@@ -34,7 +63,28 @@ def delete_user(conn, user_id):
     except sqlite3.Error as e:
         print(f"Error deleting user: {e}")
 
+def modify_user(conn, idClient, new_username=None, new_email=None):
+    """Modifie les détails d'un utilisateur dans la base de données."""
+    cursor = conn.cursor()
+    updates = []
+    params = []
+
+    if new_username:
+        updates.append("username = ?")
+        params.append(new_username)
+    if new_email:
+        updates.append("email = ?")
+        params.append(new_email)
+
+    params.append(idClient)
+    sql = f"UPDATE Clients SET {', '.join(updates)} WHERE username = ?"
+    
+    cursor.execute(sql, params)
+    conn.commit()
+    print(f"User {idClient} updated successfully.")
+
 # Fonctions pour manipuler la table Demandes
+
 def add_demande(conn, user_id, request_text):
     """Ajoute une demande à la base de données."""
     cursor = conn.cursor()
@@ -42,7 +92,17 @@ def add_demande(conn, user_id, request_text):
     conn.commit()
     print(f"Request added for user {user_id}")
 
+def delete_demande(conn, idProjet):
+    """Supprime une demande de la base de données."""
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Demandes WHERE id = ?", (idProjet,))
+    conn.commit()
+    print(f"La demande {idProjet} supprimé de Demandes")
+
+def modify_demande(conn, demande_id, new_request_text):
+    pass
 # Fonctions pour manipuler la table Projets
+
 def add_projet(conn, idClient, idProjet, intitule, deadline, commentaire):
     """Ajoute un projet à la base de données."""
     cursor = conn.cursor()
@@ -50,7 +110,39 @@ def add_projet(conn, idClient, idProjet, intitule, deadline, commentaire):
     conn.commit()
     print(f"Project {intitule} added successfully.")
 
+def delete_projet(conn, idProjet):
+    """Supprime un projet de la base de données."""
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Projets WHERE idProjet = ?", (idProjet,))
+    conn.commit()
+    print(f"Project {idProjet} supprimé de Projets")
+
+def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_description=None):
+    """Modifie les détails d'un projet dans la base de données."""
+    cursor = conn.cursor()
+    updates = []
+    params = []
+
+    if new_intitule:
+        updates.append("intitule = ?")
+        params.append(new_intitule)
+    if new_deadline:
+        updates.append("deadline = ?")
+        params.append(new_deadline)
+    if new_description:
+        updates.append("description = ?")
+        params.append(new_description)
+
+    params.append(idProjet)
+    sql = f"UPDATE Projets SET {', '.join(updates)} WHERE idProjet = ?"
+    
+    cursor.execute(sql, params)
+    conn.commit()
+    print(f"Project {idProjet} updated successfully.")
+
 conn = connect_db("testprojet")
 
-with conn:
-    add_projet(conn, 1, 1, "Projet Alpha", "2024-12-31", "Premier projet important")
+
+
+
+
