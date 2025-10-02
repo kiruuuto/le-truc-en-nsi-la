@@ -102,7 +102,7 @@ def read_demandes(conn):
         print(row)
 
 def add_demande(conn, idClient, description):
-    """Ajoute une demande à la base de données."""
+    """Ajoute une demande à la base de données Demandes."""
     cursor = conn.cursor()
     cursor.execute("INSERT INTO Demandes (idClient, request_text) VALUES (?, ?)", (idClient, description))
     conn.commit()
@@ -115,8 +115,59 @@ def delete_demande(conn, idProjet):
     conn.commit()
     print(f"La demande {idProjet} supprimé de Demandes")
 
-def modify_demande(conn, idProjet, intitule=None, description=None):
+def modify_demande(conn, new_username=None, new_email=None, new_intitule=None, new_deadline=None, new_description=None):
+    """Modifier une demande de la base de données"""
+    cursor = conn.cursor()
+    updates = []
+    params = []
+
+    if new_username:
+        updates.append("username = ?")
+        params.append(new_username)
+    
+    if new_email:
+        updates.append("email = ?")
+        params.append(new_email)
+
+    if new_intitule:
+        updates.append("intitule = ?")
+        params.append(new_intitule)
+    
+    if new_deadline:
+        updates.append("deadline = ?")
+        params.append(new_deadline)
+    
+    if new_description:
+        updates.append("description = ?")
+        params.append(new_description)
+    
+    cursor.execute("UPDATE Demandes SET")
     pass
+
+'''
+
+FAUT UTILISER CE TEMPLATE 
+
+def modify_user(conn, idClient, new_username=None, new_email=None):
+    """Modifie les détails d'un utilisateur dans la base de données."""
+    cursor = conn.cursor()
+    updates = []
+    params = []
+
+    if new_username:
+        updates.append("username = ?")
+        params.append(new_username)
+    if new_email:
+        updates.append("email = ?")
+        params.append(new_email)
+
+    params.append(idClient)
+    sql = f"UPDATE Clients SET {', '.join(updates)} WHERE username = ?"
+    
+    cursor.execute(sql, params)
+    conn.commit()
+    print(f"User {idClient} updated successfully.")
+'''
 
 # Fonctions pour manipuler la table Projets
 
@@ -166,8 +217,5 @@ def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_desc
     print(f"Project {idProjet} updated successfully.")
 
 conn = connect_db("testprojet")
-
-
-
 
 
