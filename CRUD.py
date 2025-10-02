@@ -202,9 +202,11 @@ def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_desc
     if new_intitule:
         updates.append("intitule = ?")
         params.append(new_intitule)
+        
     if new_deadline:
         updates.append("deadline = ?")
         params.append(new_deadline)
+
     if new_description:
         updates.append("description = ?")
         params.append(new_description)
@@ -218,4 +220,4 @@ def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_desc
 
 conn = connect_db("testprojet")
 
-
+""""""  
