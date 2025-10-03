@@ -59,7 +59,7 @@ def add_user(conn, username, email):
     else:
         cursor.execute("INSERT INTO Clients (username, email) VALUES (?, ?)", (username, email))
     conn.commit()
-    print(f"User {username} added successfully.")
+    print(f"L'utilisateur {username} a été supprimé de Clients.")
 
 def delete_user(conn, user_id):
     """Supprime un utilisateur de la base de données."""
@@ -67,7 +67,7 @@ def delete_user(conn, user_id):
         cursor = conn.cursor()
         cursor.execute("DELETE FROM Clients WHERE username = ?", (user_id,))
         conn.commit()
-        print(f"User {user_id} supprimé de Clients")
+        print(f"L'utilisateur {user_id} supprimé de Clients")
     except sqlite3.Error as e:
         print(f"Error deleting user: {e}")
 
@@ -89,7 +89,7 @@ def modify_user(conn, idClient, new_username=None, new_email=None):
     
     cursor.execute(sql, params)
     conn.commit()
-    print(f"User {idClient} updated successfully.")
+    print(f"L'utilisateur {idClient} a été modifié.")
 
 # Fonctions pour manipuler la table Demandes
 
@@ -115,11 +115,12 @@ def delete_demande(conn, idProjet):
     conn.commit()
     print(f"La demande {idProjet} supprimé de Demandes")
 
-def modify_demande(conn, new_username=None, new_email=None, new_intitule=None, new_deadline=None, new_description=None):
+def modify_demande(conn, idProjet, new_username=None, new_email=None, new_intitule=None, new_deadline=None, new_description=None):
     """Modifier une demande de la base de données"""
     cursor = conn.cursor()
     updates = []
     params = []
+    
 
     if new_username:
         updates.append("username = ?")
@@ -140,8 +141,11 @@ def modify_demande(conn, new_username=None, new_email=None, new_intitule=None, n
     if new_description:
         updates.append("description = ?")
         params.append(new_description)
-    
-    cursor.execute("UPDATE Demandes SET")
+    params.append(idProjet)
+    sql = f"UPDATE Demandes SET {', '.join(updates)} WHERE idProjet = ?"
+    cursor.execute(sql, params)
+    conn.commit()
+    print(f"La demande {idProjet} a été modifiée.")
     pass
 
 '''
@@ -166,7 +170,7 @@ def modify_user(conn, idClient, new_username=None, new_email=None):
     
     cursor.execute(sql, params)
     conn.commit()
-    print(f"User {idClient} updated successfully.")
+    print(f"User {idClient} A éTé AHOUTé.")
 '''
 
 # Fonctions pour manipuler la table Projets
@@ -216,7 +220,7 @@ def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_desc
     
     cursor.execute(sql, params)
     conn.commit()
-    print(f"Project {idProjet} updated successfully.")
+    print(f"Project {idProjet} a été ajouté.")
 
 conn = connect_db("testprojet")
 
