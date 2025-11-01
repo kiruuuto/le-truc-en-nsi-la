@@ -28,11 +28,15 @@ et 3 fonctions modify pour chaque table
 
 
 
+def debug(variable, message):
+    """Fonction de debug pour afficher des messages conditionnellement."""
+    if variable:
+        print(f"[DEBUG] {message}")
 
-def connect_db(db_name):
-    """bah ca se connecte quoi."""
+def connect_db(db_name, debug_variable=False):
+    """Connection a la base de donnée sqlite."""
     conn = sqlite3.connect(db_name)
-    print(f"Connecté à : {db_name}")
+    debug(debug_variable, f"Connecté à : {db_name}")
     return conn
 
 #Fonctions pour manipuler la table Clients
@@ -45,7 +49,7 @@ def read_users(conn):
     for row in rows:
         print(row)
 
-def add_user(conn, username, email):
+def add_user(conn, username, email, debug_variable=False):
     """Ajoute un utilisateur à la base de données."""
 
     cursor = conn.cursor()
@@ -59,19 +63,19 @@ def add_user(conn, username, email):
     else:
         cursor.execute("INSERT INTO Clients (username, email) VALUES (?, ?)", (username, email))
     conn.commit()
-    print(f"L'utilisateur {username} a été supprimé de Clients.")
+    debug(debug_variable, f"L'utilisateur {username} a été ajouté dans Clients.")
 
-def delete_user(conn, user_id):
+def delete_user(conn, user_id, debug_variable=False):
     """Supprime un utilisateur de la base de données."""
     try:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM Clients WHERE username = ?", (user_id,))
         conn.commit()
-        print(f"L'utilisateur {user_id} supprimé de Clients")
+        debug(debug_variable,f"L'utilisateur {user_id} supprimé de Clients")
     except sqlite3.Error as e:
-        print(f"Error deleting user: {e}")
+        debug(debug_variable, f"Error deleting user: {e}")
 
-def modify_user(conn, idClient, new_username=None, new_email=None):
+def modify_user(conn, idClient, new_username=None, new_email=None, debug_variable=False):
     """Modifie les détails d'un utilisateur dans la base de données."""
     cursor = conn.cursor()
     updates = []
@@ -89,11 +93,11 @@ def modify_user(conn, idClient, new_username=None, new_email=None):
     
     cursor.execute(sql, params)
     conn.commit()
-    print(f"L'utilisateur {idClient} a été modifié.")
+    debug(debug_variable, f"L'utilisateur {idClient} a été modifié.")
 
 # Fonctions pour manipuler la table Demandes
 
-def read_demandes(conn):
+def read_demandes(conn, debug_variable=False):
     """Lit et affiche toutes les demandes de la base de données."""
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Demandes")
@@ -101,21 +105,21 @@ def read_demandes(conn):
     for row in rows:
         print(row)
 
-def add_demande(conn, idClient, description):
+def add_demande(conn, idClient, description, debug_variable=False):
     """Ajoute une demande à la base de données Demandes."""
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Demandes (idClient, request_text) VALUES (?, ?)", (idClient, description))
+    cursor.execute("INSERT INTO Demandes (idClient, description) VALUES (?, ?)", (idClient, description))
     conn.commit()
-    print(f"Request added for user {idClient}")
+    debug(debug_variable, f"Request added for user {idClient}")
 
-def delete_demande(conn, idProjet):
+def delete_demande(conn, idProjet, debug_variable=False):
     """Supprime une demande de la base de données."""
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM Demandes WHERE id = ?", (idProjet,))
+    cursor.execute("DELETE FROM Demandes WHERE idProjet = ?", (idProjet,))
     conn.commit()
-    print(f"La demande {idProjet} supprimé de Demandes")
+    debug(debug_variable, f"La demande {idProjet} supprimé de Demandes")
 
-def modify_demande(conn, idProjet, new_username=None, new_email=None, new_intitule=None, new_deadline=None, new_description=None):
+def modify_demande(conn, idProjet, new_username=None, new_email=None, new_intitule=None, new_deadline=None, new_description=None, debug_variable=False):
     """Modifier une demande de la base de données"""
     cursor = conn.cursor()
     updates = []
@@ -145,8 +149,7 @@ def modify_demande(conn, idProjet, new_username=None, new_email=None, new_intitu
     sql = f"UPDATE Demandes SET {', '.join(updates)} WHERE idProjet = ?"
     cursor.execute(sql, params)
     conn.commit()
-    print(f"La demande {idProjet} a été modifiée.")
-    pass
+    debug(debug_variable, f"La demande {idProjet} a été modifiée.")
 
 '''
 
@@ -175,7 +178,7 @@ def modify_user(conn, idClient, new_username=None, new_email=None):
 
 # Fonctions pour manipuler la table Projets
 
-def read_projets(conn):
+def read_projets(conn, debug_variable=False):
     """Lit et affiche tous les projets de la base de données."""
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Projets")
@@ -183,21 +186,21 @@ def read_projets(conn):
     for row in rows:
         print(row)
 
-def add_projet(conn, idClient, idProjet, intitule, deadline, commentaire):
+def add_projet(conn, idClient, idProjet, intitule, deadline, commentaire, debug_variable=False):
     """Ajoute un projet à la base de données."""
     cursor = conn.cursor()
     cursor.execute("INSERT INTO Projets (idClient, idProjet, intitule, deadline, description) VALUES (?, ?, ?, ?, ?)", (idClient, idProjet, intitule, deadline, commentaire))
     conn.commit()
-    print(f"Project {intitule} added successfully.")
+    debug(debug_variable, f"Project {intitule} added successfully.")
 
-def delete_projet(conn, idProjet):
+def delete_projet(conn, idProjet, debug_variable=False):
     """Supprime un projet de la base de données."""
     cursor = conn.cursor()
     cursor.execute("DELETE FROM Projets WHERE idProjet = ?", (idProjet,))
     conn.commit()
-    print(f"Project {idProjet} supprimé de Projets")
+    debug(debug_variable, f"Project {idProjet} supprimé de Projets")
 
-def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_description=None):
+def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_description=None, debug_variable=False):
     """Modifie les détails d'un projet dans la base de données."""
     cursor = conn.cursor()
     updates = []
@@ -220,10 +223,83 @@ def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_desc
     
     cursor.execute(sql, params)
     conn.commit()
-    print(f"Project {idProjet} a été ajouté.")
+    debug(debug_variable, f"Project {idProjet} a été ajouté.")
 
-conn = connect_db("testprojet")
 
 """def add_record(conn, table_name, entetes, [entetes][valeurs]
 
 """  
+
+if __name__ == "__main__":
+    # Nom de la base de données
+    db_name = "testprojet"
+
+    # Connexion à la base de données
+    conn = connect_db(db_name, debug_variable=True)
+#------------------------------------ Test de l'ajout a la base de donnée dans les différentes tables -----------------------------------------------------------
+    print("\n=== Ajout de données de test ===")
+    try:
+        add_user(conn, "test_user", "test@example.com", debug_variable=True)
+        add_demande(conn, 1, "Nouvelle demande de test", debug_variable=True)
+        add_projet(conn, 1, 99, "Projet test", "2025-12-31", "Description du projet test", debug_variable=True)
+    except Exception as e:
+        print(f"Erreur lors de l'ajout : {e}")
+#-------------------------------------- Première lecture des tables : Les enregistrements ont bien été ajoutés ----------------------------------------------------------------------------
+    print("\n=== Lecture des tables existantes ===")
+    try:
+        print("\n--- Clients ---")
+        read_users(conn)
+
+        print("\n--- Demandes ---")
+        read_demandes(conn)
+
+        print("\n--- Projets ---")
+        read_projets(conn)
+    except Exception as e:
+        print(f"Erreur lors de la lecture : {e}")
+#-------------------------------------- Test de modifiaction d'enregistrements des différentes tables de la bdd -----------------------------------------------------------------------
+    print("\n=== Modifications ===")
+    try:
+        modify_user(conn, "test_user", new_email="newmail@example.com", debug_variable=True)
+        modify_demande(conn, 1, new_description="Demande mise à jour", debug_variable=True)
+        modify_projet(conn, 99, new_description="Projet mis à jour", debug_variable=True)
+    except Exception as e:
+        print(f"Erreur lors de la modification : {e}")
+#-------------------------------------- Seconde lecture des tables : Les enregistrements ont bien été modifiés----------------------------------------------------------------------------
+    print("\n=== Lecture des tables existantes ===")
+    try:
+        print("\n--- Clients ---")
+        read_users(conn)
+
+        print("\n--- Demandes ---")
+        read_demandes(conn)
+
+        print("\n--- Projets ---")
+        read_projets(conn)
+    except Exception as e:
+        print(f"Erreur lors de la lecture : {e}")
+#------------------------------------- Suppression d'enregistrements dans les tables de la bdd -----------------------------------------------------------------------------
+    print("\n=== Suppressions ===")
+    try:
+        delete_user(conn, "test_user", debug_variable=True)
+        delete_demande(conn, 1, debug_variable=True)
+        delete_projet(conn, 99, debug_variable=True)
+    except Exception as e:
+        print(f"Erreur lors de la suppression : {e}")
+#--------------------------------------- Derniere lecture : tous les enregistrements test ont bien été supprimés ---------------------------------------------------------------------------      
+    print("\n=== Lecture des tables existantes ===")
+    try:
+        print("\n--- Clients ---")
+        read_users(conn)
+
+        print("\n--- Demandes ---")
+        read_demandes(conn)
+
+        print("\n--- Projets ---")
+        read_projets(conn)
+    except Exception as e:
+        print(f"Erreur lors de la lecture : {e}")  
+#------------------------------------------------------------------------------------------------------------------
+    # Fermeture propre
+    conn.close()
+    print("\nConnexion fermée proprement")
