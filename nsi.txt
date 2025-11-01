@@ -1,0 +1,84 @@
+base sqlite
+
+dev un app qui ne sont pas dev
+
+au moins 3 tables
+dates, planning, adhérants 
+
+
+
+bd + moteur.py + IHM pyqt6
+
+architecture 3 tiers
+
+
+
+
+1) schema BD
+
+2) proto des fonctions
+
+3) versions intermediaires
+
+
+
+letterboxd mais en mode jv
+
+
+
+
+
+
+
+FAUT UTILISER CE TEMPLATE 
+
+def modify_user(conn, idClient, new_username=None, new_email=None):
+    """Modifie les détails d'un utilisateur dans la base de données."""
+    cursor = conn.cursor()
+    updates = []
+    params = []
+
+    if new_username:
+        updates.append("username = ?")
+        params.append(new_username)
+    if new_email:
+        updates.append("email = ?")
+        params.append(new_email)
+
+    params.append(idClient)
+    sql = f"UPDATE Clients SET {', '.join(updates)} WHERE username = ?"
+    
+    cursor.execute(sql, params)
+    conn.commit()
+    print(f"User {idClient} A éTé AHOUTé.")
+
+
+
+
+'''
+
+faudrait faire 2 fonctions add delete + 3 fonctions modifier
+
+au lieu de 3*3 fonctions 
+
+on passe de 9 fonctions à 5 fonctions
+
+
+
+
+pour les 3 tables faut pouvoir ajouter supprimer et modifier
+
+soit on fait 3 fonctions add delete modify avec pour chaque tables
+
+soit on fait 2 fonctions add delete ou on modifie juste la table, on la met en variable
+et 3 fonctions modify pour chaque table
+
+
+'''
+
+
+
+"""def add_record(conn, table_name, entetes, [entetes][valeurs]
+
+"""  
+
