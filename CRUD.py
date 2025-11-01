@@ -1,28 +1,86 @@
 import sqlite3
 
-def debug(variable, message):
-    """Fonction de debug pour afficher des messages conditionnellement."""
+def debug(
+    variable: bool, 
+    message: str
+):
+    """
+    Affiche un message de debug si le paramètre 'variable' est True.
+
+    Paramètres :
+    -----------
+    variable : bool
+        Contrôle si le message est affiché.
+    message : str
+        Le message à afficher.
+    """
+
     if variable:
         print(f"[DEBUG] {message}")
 
-def connect_db(db_name, debug_variable=False):
-    """Connection a la base de donnée sqlite."""
+def connect_db(
+    db_name: str, 
+    debug_variable=False
+):
+    """
+    Connecte à une base de données SQLite et retourne la connexion.
+
+    Paramètres :
+    -----------
+    db_name : str
+        Le nom du fichier de la base de données.
+    debug_variable : bool, optionnel
+        Si True, affiche un message de debug (par defaut False).
+
+    Retour :
+    -------
+    sqlite3.connect
+        Objet de connexion à la base de données.
+    """
+
     conn = sqlite3.connect(db_name)
     debug(debug_variable, f"Connecte a : {db_name}")
     return conn
 
 #Fonctions pour manipuler la table Clients
 
-def read_users(conn):
-    """Lit et affiche tous les utilisateurs de la base de données."""
+def read_users(
+    conn: sqlite3.connect
+):
+    """
+    Lit et affiche tous les utilisateurs de la table Clients.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Clients")
     rows = cursor.fetchall()
     for row in rows:
         print(row)
 
-def add_user(conn, username, email, debug_variable=False):
-    """Ajoute un utilisateur a la base de données."""
+def add_user(
+    conn: sqlite3.connect, 
+    username: str, 
+    email: str, 
+    debug_variable=False
+):
+    """
+    Ajoute un nouvel utilisateur à la table Clients.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    username : str
+        Nom d'utilisateur à ajouter.
+    email : str
+        Email de l'utilisateur.
+    debug_variable : bool, optionel
+        Si True, affiche un message de debug (par defaut False).
+    """
 
     cursor = conn.cursor()
 
@@ -37,18 +95,54 @@ def add_user(conn, username, email, debug_variable=False):
     conn.commit()
     debug(debug_variable, f"L'utilisateur {username} a ete ajoute dans Clients.")
 
-def delete_user(conn, user_id, debug_variable=False):
-    """Supprime un utilisateur de la base de données."""
+def delete_user(
+    conn: sqlite3.connect, 
+    username: str, 
+    debug_variable=False
+):
+    """
+    Supprime un utilisateur de la table Clients.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    user_id : str
+        Nom d'utilisateur à supprimer.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     try:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM Clients WHERE username = ?", (user_id,))
+        cursor.execute("DELETE FROM Clients WHERE username = ?", (username,))
         conn.commit()
-        debug(debug_variable,f"L'utilisateur {user_id} supprime de Clients")
+        debug(debug_variable,f"L'utilisateur {username} supprime de Clients")
     except sqlite3.Error as e:
         debug(debug_variable, f"Error deleting user: {e}")
 
-def modify_user(conn, idClient, new_username=None, new_email=None, debug_variable=False):
-    """Modifie les détails d'un utilisateur dans la base de données."""
+def modify_user(
+    conn: str, 
+    username=None, 
+    new_username=None, 
+    new_email=None, 
+    debug_variable=False
+):
+    """
+    Modifie les informations d'un utilisateur dans la table Clients.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    idClient : str
+        Nom d'utilisateur à modifier.
+    new_username : str, optional
+        Nouveau nom d'utilisateur.
+    new_email : str, optional
+        Nouvel email.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     cursor = conn.cursor()
     updates = []
     params = []
@@ -60,45 +154,86 @@ def modify_user(conn, idClient, new_username=None, new_email=None, debug_variabl
         updates.append("email = ?")
         params.append(new_email)
 
-    params.append(idClient)
+    params.append(username)
     sql = f"UPDATE Clients SET {', '.join(updates)} WHERE username = ?"
     
     cursor.execute(sql, params)
     conn.commit()
-    debug(debug_variable, f"L'utilisateur {idClient} a ete modifie.")
+    debug(debug_variable, f"L'utilisateur {username} a ete modifie.")
 
 # Fonctions pour manipuler la table Demandes
 
-def read_demandes(conn, debug_variable=False):
-    """Lit et affiche toutes les demandes de la base de donnees."""
+def read_demandes(
+    conn: sqlite3.connect,
+    debug_variable=False
+):
+    """
+    Lit et affiche toutes les demandes de la table Demandes.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Demandes")
     rows = cursor.fetchall()
     for row in rows:
         print(row)
 
-def add_demande(conn, idClient, description, debug_variable=False):
-    """Ajoute une demande à la base de données Demandes."""
+def add_demande(
+    conn: sqlite3.connect, 
+    idClient: int, 
+    description: str, 
+    debug_variable=False
+):
+    """
+    Ajoute une demande dans la table Demandes.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    idClient : int
+        Identifiant de l'utilisateur.
+    description : str
+        Description de la demande.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (default is False).
+    """
     cursor = conn.cursor()
     cursor.execute("INSERT INTO Demandes (idClient, description) VALUES (?, ?)", (idClient, description))
     conn.commit()
     debug(debug_variable, f"Request added for user {idClient}")
 
 def delete_demande(
-    conn, 
-    idProjet, 
+    conn: sqlite3.connect, 
+    idProjet: int, 
     debug_variable=False
 ):
     
-    """Supprime une demande de la base de donnees."""
+    """
+    Supprime une demande de la table Demandes.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    idProjet : int
+        Identifiant de la demande/Projet à supprimer.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     cursor = conn.cursor()
     cursor.execute("DELETE FROM Demandes WHERE idProjet = ?", (idProjet,))
     conn.commit()
     debug(debug_variable, f"La demande {idProjet} supprime de Demandes")
 
 def modify_demande(
-    conn, 
-    idProjet, 
+    conn: sqlite3.connect, 
+    idProjet: int, 
     new_username=None, 
     new_email=None, 
     new_intitule=None, 
@@ -129,7 +264,7 @@ def modify_demande(
     new_description : str, optionnel
         Nouvelle description de la demande.
     debug_variable : bool, optionnel
-        Si True, affiche des messages de debug (par défaut False).
+        Si True, affiche des messages de debug (par defaut False).
 
     Retour :
     -------
@@ -173,33 +308,107 @@ def modify_demande(
 # Fonctions pour manipuler la table Projets
 
 def read_projets(
-    conn, 
+    conn: sqlite3.connect, 
     debug_variable=False
 ):
     """
-    Lit et affiche tous les projets de la base de donnees."""
+    Lit et affiche toutes les demandes de la table Projets.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Projets")
     rows = cursor.fetchall()
     for row in rows:
         print(row)
 
-def add_projet(conn, idClient, idProjet, intitule, deadline, commentaire, debug_variable=False):
-    """Ajoute un projet à la base de donnees."""
+def add_projet(
+        conn: sqlite3.connect, 
+        idClient: int, 
+        idProjet: int, 
+        intitule: str, 
+        deadline: str, 
+        commentaire: str, 
+        debug_variable=False
+):
+    """
+    Ajoute un projet dans la table Projets.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    idClient : int
+        Identifiant de l'utilisateur.
+    idProjet : int
+        Identifiant du projet.
+    intitule : str
+        Titre du projet.
+    deadline : str
+        Date limite du projet (format 'YYYY-MM-DD').
+    commentaire : str
+        Description/commentaire du projet.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     cursor = conn.cursor()
     cursor.execute("INSERT INTO Projets (idClient, idProjet, intitule, deadline, description) VALUES (?, ?, ?, ?, ?)", (idClient, idProjet, intitule, deadline, commentaire))
     conn.commit()
     debug(debug_variable, f"Project {intitule} added successfully.")
 
-def delete_projet(conn, idProjet, debug_variable=False):
-    """Supprime un projet de la base de donnees."""
+def delete_projet(
+    conn: sqlite3.connect, 
+    idProjet: int, 
+    debug_variable=False
+):
+    """
+    Supprime un projet de la table Projets.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    idProjet : int
+        Identifiant du projet à supprimer.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     cursor = conn.cursor()
     cursor.execute("DELETE FROM Projets WHERE idProjet = ?", (idProjet,))
     conn.commit()
     debug(debug_variable, f"Project {idProjet} supprime de Projets")
 
-def modify_projet(conn, idProjet, new_intitule=None, new_deadline=None, new_description=None, debug_variable=False):
-    """Modifie les details d'un projet dans la base de donnees."""
+def modify_projet(
+    conn: sqlite3.connect, 
+    idProjet: int, 
+    new_intitule=None, 
+    new_deadline=None, 
+    new_description=None, 
+    debug_variable=False
+):
+    """
+    Modifie les informations d'un projet dans la table Projets.
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        La connexion à la base de données.
+    idProjet : int
+        Identifiant du projet à modifier.
+    new_intitule : str, optional
+        Nouveau titre du projet.
+    new_deadline : str, optional
+        Nouvelle date limite (format 'YYYY-MM-DD').
+    new_description : str, optional
+        Nouvelle description du projet.
+    debug_variable : bool, optional
+        Si True, affiche un message de debug (par defaut False).
+    """
     cursor = conn.cursor()
     updates = []
     params = []
@@ -277,7 +486,7 @@ if __name__ == "__main__":
     try:
         delete_user(conn, "test_user", debug_variable=True)
         delete_demande(conn, 1, debug_variable=True)
-        delete_projet(conn, 99, debug_variable=True)
+        delete_projet(conn, 1, debug_variable=True)
     except Exception as e:
         print(f"Erreur lors de la suppression : {e}")
 #--------------------------------------- Derniere lecture : tous les enregistrements test ont bien été supprimés ---------------------------------------------------------------------------      
