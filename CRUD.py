@@ -184,8 +184,11 @@ def read_demandes(
         print(row)
 
 def add_demande(
-    conn: sqlite3.connect, 
-    idClient: int, 
+    conn: sqlite3.connect,
+    username: str,
+    email : str,
+    intitule: str,
+    deadline: str, 
     description: str, 
     debug_variable=False
 ):
@@ -196,17 +199,24 @@ def add_demande(
     ----------
     conn : sqlite3.Connection
         La connexion à la base de données.
-    idClient : int
-        Identifiant de l'utilisateur.
+    username : str
+        Nom d'utilisateur de la demande.
+    email : str
+        Email de l'utilisateur.
+    intitule : str
+        Titre de la demande.
+    deadline : str
+        Date limite de la demande (format 'YYYY-MM-DD').
     description : str
         Description de la demande.
     debug_variable : bool, optional
-        Si True, affiche un message de debug (default is False).
+        Si True, affiche un message de debug (par defaut False).
     """
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Demandes (idClient, description) VALUES (?, ?)", (idClient, description))
+    idClient = int(cursor.execute("SELECT id FROM Clients WHERE username = ? AND email = ?", (username,email)).fetchone()[0])
+    cursor.execute("INSERT INTO Demandes (idClient, username, email, intitule, deadline, description) VALUES (?, ?, ?, ?, ?, ?)", (idClient, username, email, intitule, deadline, description))
     conn.commit()
-    debug(debug_variable, f"Request added for user {idClient}")
+    debug(debug_variable, f"Request added for user {username}")
 
 def delete_demande(
     conn: sqlite3.connect, 
@@ -329,11 +339,11 @@ def read_projets(
 
 def add_projet(
         conn: sqlite3.connect, 
-        idClient: int, 
-        idProjet: int, 
+        username: str,
+        email : str, 
         intitule: str, 
         deadline: str, 
-        commentaire: str, 
+        description: str, 
         debug_variable=False
 ):
     """
@@ -343,8 +353,10 @@ def add_projet(
     ----------
     conn : sqlite3.Connection
         La connexion à la base de données.
-    idClient : int
-        Identifiant de l'utilisateur.
+    username : str
+        Nom d'utilisateur de la demande.
+    email : str
+        Email de l'utilisateur.
     idProjet : int
         Identifiant du projet.
     intitule : str
@@ -357,7 +369,26 @@ def add_projet(
         Si True, affiche un message de debug (par defaut False).
     """
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Projets (idClient, idProjet, intitule, deadline, description) VALUES (?, ?, ?, ?, ?)", (idClient, idProjet, intitule, deadline, commentaire))
+    
+    # Chercher l'idClient
+    client_row = cursor.execute(
+        "SELECT id FROM Clients WHERE username = ? AND email = ?", 
+        (username, email)
+    ).fetchone()
+    if client_row is None:
+        raise ValueError(f"Aucun client trouvé pour {username} ({email})")
+    idClient = int(client_row[0])
+
+    # Chercher l'idProjet
+    projet_row = cursor.execute(
+        "SELECT idProjet FROM Demandes WHERE intitule = ? AND username = ? AND email = ?", 
+        (intitule, username, email)
+    ).fetchone()
+    if projet_row is None:
+        raise ValueError(f"Aucune demande trouvée pour le projet '{intitule}' ({username}, {email})")
+    idProjet = int(projet_row[0])
+
+    cursor.execute("INSERT INTO Projets (idClient, idProjet, username, email, intitule, deadline, description) VALUES (?, ?, ?, ?, ?, ? ,?)", (idClient, idProjet, username, email, intitule, deadline, description))
     conn.commit()
     debug(debug_variable, f"Project {intitule} added successfully.")
 
@@ -433,6 +464,8 @@ def modify_projet(
     debug(debug_variable, f"Project {idProjet} a ete modifie.")
 
 
+#------------------------------- Point d'entrée : Programme principal de test des fonctions CRUD -------------------------------------------------------------------------------
+
 if __name__ == "__main__":
     # Nom de la base de données
     db_name = "testprojet"
@@ -443,8 +476,8 @@ if __name__ == "__main__":
     print("\n=== Ajout d'enregistrements de test ===")
     try:
         add_user(conn, "test_user", "test@example.com", debug_variable=True)
-        add_demande(conn, 1, "Nouvelle demande de test", debug_variable=True)
-        add_projet(conn, 1, 1, "Projet test", "2025-12-31", "Description du projet test", debug_variable=True)
+        add_demande(conn, "test_user", "test@example.com", "moteur python", "2025-11-03", "Il faut une fonction debug...", debug_variable=True)
+        add_projet(conn, "test_user", "test@example.com", "moteur python", "2025-11-03", "Il faut une fonction debug...", debug_variable=True)
     except Exception as e:
         print(f"Erreur lors de l'ajout : {e}")
 #-------------------------------------- Première lecture des tables : Les enregistrements ont bien été ajoutés ----------------------------------------------------------------------------
